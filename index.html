@@ -6,15 +6,343 @@
     <title>Bharat Workplace Engine | CAP-061</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Vercel Web Analytics -->
     <script>
       window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
+    <style>
+        :root {
+            --bg: #020817;
+            --panel: #0f172a;
+            --panel-strong: #111827;
+            --panel-soft: #0b1220;
+            --border: rgba(148, 163, 184, 0.2);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --emerald: #34d399;
+            --green-soft: rgba(52, 211, 153, 0.12);
+            --blue: #60a5fa;
+            --purple: #a78bfa;
+            --amber: #fbbf24;
+            --red: #f87171;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(180deg, #020817 0%, #020817 100%);
+            color: var(--text);
+        }
+
+        .app-shell {
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1.5fr) minmax(340px, 1fr);
+            min-height: calc(100vh - 74px);
+        }
+
+        .sidebar, .inspector {
+            background: rgba(15, 23, 42, 0.78);
+            border-right: 1px solid var(--border);
+        }
+
+        .inspector {
+            border-right: none;
+            border-left: 1px solid var(--border);
+        }
+
+        .sidebar-inner, .inspector-inner {
+            padding: 1rem;
+            height: 100%;
+        }
+
+        .channel-btn {
+            width: 100%;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #cbd5e1;
+            text-align: left;
+            padding: 0.8rem 0.9rem;
+            border-radius: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.45rem;
+            transition: all 0.2s ease;
+        }
+
+        .channel-btn:hover, .channel-btn.active {
+            background: rgba(15, 23, 42, 0.95);
+            border-color: rgba(52, 211, 153, 0.2);
+            color: #d1fae5;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+
+        .status-pill.green {
+            background: rgba(16, 185, 129, 0.1);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .status-pill.blue {
+            background: rgba(96, 165, 250, 0.1);
+            color: #93c5fd;
+            border-color: rgba(96, 165, 250, 0.25);
+        }
+
+        .status-pill.purple {
+            background: rgba(167, 139, 250, 0.1);
+            color: #c4b5fd;
+            border-color: rgba(167, 139, 250, 0.25);
+        }
+
+        .status-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 999px;
+            display: inline-block;
+            background: currentColor;
+            box-shadow: 0 0 12px currentColor;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.84);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .feed-panel {
+            background: rgba(2, 8, 23, 0.8);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .feed-header {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.35);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.1rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .bubble {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 2.3rem;
+            height: 2.3rem;
+            border-radius: 0.8rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            flex-shrink: 0;
+        }
+
+        .avatar.user { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border-color: rgba(52, 211, 153, 0.25); }
+        .avatar.system { background: rgba(96, 165, 250, 0.1); color: #93c5fd; border-color: rgba(96, 165, 250, 0.25); }
+        .avatar.ops { background: rgba(167, 139, 250, 0.12); color: #c4b5fd; border-color: rgba(167, 139, 250, 0.25); }
+
+        .message-box {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.8rem 0.9rem;
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.8rem;
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-bottom: 0.45rem;
+        }
+
+        .message-text {
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .composer {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        .composer form {
+            display: flex;
+            gap: 0.7rem;
+        }
+
+        .composer input {
+            width: 100%;
+            background: rgba(2, 8, 23, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 0.8rem;
+            color: var(--text);
+            padding: 0.8rem 0.9rem;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .composer input:focus {
+            border-color: rgba(52, 211, 153, 0.45);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.08);
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            color: #022c22;
+            font-weight: 700;
+            border: none;
+            border-radius: 0.8rem;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .primary-btn:hover { transform: translateY(-1px); }
+
+        .inspector-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .kpi-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.7rem;
+        }
+
+        .mini-card {
+            border: 1px solid var(--border);
+            border-radius: 0.9rem;
+            background: rgba(15, 23, 42, 0.75);
+            padding: 0.8rem 0.75rem;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            margin-bottom: 0.35rem;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.74rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.6rem 0.5rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+        }
+
+        th {
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        td {
+            color: #dbeafe;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            padding: 0.2rem 0.55rem;
+            border: 1px solid transparent;
+        }
+
+        .tag.good {
+            background: rgba(16, 185, 129, 0.12);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .tag.warn {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fcd34d;
+            border-color: rgba(251, 191, 36, 0.25);
+        }
+
+        .tag.alert {
+            background: rgba(248, 113, 113, 0.12);
+            color: #fca5a5;
+            border-color: rgba(248, 113, 113, 0.25);
+        }
+
+        @media (max-width: 1180px) {
+            .app-shell {
+                grid-template-columns: 220px 1fr;
+            }
+            .inspector {
+                grid-column: 1 / -1;
+                border-left: none;
+                border-top: 1px solid var(--border);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+            .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+            .composer form { flex-direction: column; }
+        }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
-
-    <!-- Header / Security Bar -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-6 py-3 flex justify-between items-center">
         <div class="flex items-center space-x-3">
             <div class="h-9 w-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-lg">
@@ -25,170 +353,305 @@
                 <p class="text-xs text-slate-400">IIT Delhi DTI-10 · Capstone CAP-061</p>
             </div>
         </div>
-        
-        <div class="flex items-center space-x-3 text-xs">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2"></span> Air-Gapped / Zero-Telemetry
+
+        <div class="flex items-center space-x-3 text-xs flex-wrap gap-2 justify-end">
+            <span class="status-pill green">
+                <span class="status-dot"></span> Air-Gapped / Zero-Telemetry
             </span>
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <span class="status-pill blue">
                 <i class="fa-solid fa-microchip mr-1.5"></i> Ollama Llama3 Local
             </span>
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <span class="status-pill purple">
                 DPDP 2023 Shield
             </span>
         </div>
     </header>
 
-    <!-- Main Grid -->
-    <div class="flex-1 grid grid-cols-12 gap-0 overflow-hidden">
-        
-        <!-- Sidebar: Desi Baithak Channels -->
-        <aside class="col-span-3 border-r border-slate-800 bg-slate-900/40 p-4 flex flex-col">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 px-2">
-                Desi Baithak (Peer Guilds)
-            </div>
-            <nav class="space-y-1">
-                <button class="w-full text-left px-3 py-2 rounded-lg bg-slate-800 text-emerald-400 font-medium text-sm flex items-center justify-between">
-                    <span><i class="fa-solid fa-comments mr-2 text-slate-400"></i> # operational-stream</span>
-                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded">Live</span>
-                </button>
-                <button class="w-full text-left px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 text-sm flex items-center justify-between">
-                    <span><i class="fa-solid fa-shield-halved mr-2 text-slate-500"></i> # hr-compliance-mesh</span>
-                </button>
-                <button class="w-full text-left px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 text-sm flex items-center justify-between">
-                    <span><i class="fa-solid fa-truck-ramp-box mr-2 text-slate-500"></i> # apparel-sourcing-logistics</span>
-                </button>
-            </nav>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-inner">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 px-2">
+                    Desi Baithak (Peer Guilds)
+                </div>
 
-            <div class="mt-auto pt-4 border-t border-slate-800/80">
-                <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 text-xs space-y-1.5">
-                    <div class="text-slate-300 font-semibold flex items-center justify-between">
-                        <span>Local Agent Status</span>
-                        <span class="text-emerald-400">Podman Active</span>
+                <div id="channelList">
+                    <button class="channel-btn active" data-channel="operational-stream">
+                        <span><i class="fa-solid fa-comments mr-2 text-slate-400"></i> # operational-stream</span>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded">Live</span>
+                    </button>
+                    <button class="channel-btn" data-channel="hr-compliance-mesh">
+                        <span><i class="fa-solid fa-shield-halved mr-2 text-slate-500"></i> # hr-compliance-mesh</span>
+                    </button>
+                    <button class="channel-btn" data-channel="apparel-sourcing-logistics">
+                        <span><i class="fa-solid fa-truck-ramp-box mr-2 text-slate-500"></i> # apparel-sourcing-logistics</span>
+                    </button>
+                    <button class="channel-btn" data-channel="factory-safety-watch">
+                        <span><i class="fa-solid fa-hard-hat mr-2 text-slate-500"></i> # factory-safety-watch</span>
+                    </button>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-800/80">
+                    <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 text-xs space-y-1.5">
+                        <div class="text-slate-300 font-semibold flex items-center justify-between">
+                            <span>Local Agent Status</span>
+                            <span class="text-emerald-400">Podman Active</span>
+                        </div>
+                        <p class="text-slate-500 text-[11px]">n8n Workflow + Matrix Synapse Gateway</p>
+                        <div class="flex justify-between text-[10px] text-slate-500">
+                            <span>LLM</span>
+                            <span class="text-emerald-400">Llama 3</span>
+                        </div>
                     </div>
-                    <p class="text-slate-500 text-[11px]">n8n Workflow + Matrix Synapse Gateway</p>
                 </div>
             </div>
         </aside>
 
-        <!-- Center: Chat Stream -->
-        <main class="col-span-5 flex flex-col border-r border-slate-800 bg-slate-950">
-            <div class="p-3 border-b border-slate-800 bg-slate-900/20 flex justify-between items-center px-4">
-                <span class="text-xs font-semibold text-slate-300">Operational Communication Feed</span>
-                <span class="text-[11px] text-slate-500">Local Matrix Room: !ops_main:localhost</span>
+        <main class="feed-panel">
+            <div class="feed-header">
+                <span class="text-xs font-semibold text-slate-300" id="roomLabel">Operational Communication Feed</span>
+                <span class="text-[11px] text-slate-500" id="roomMeta">Local Matrix Room: !ops_main:localhost</span>
             </div>
 
-            <!-- Messages Box -->
-            <div id="chatFeed" class="flex-1 p-4 space-y-4 overflow-y-auto max-h-[calc(100vh-180px)]">
-                <div class="flex items-start space-x-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center font-bold text-xs">
-                        AR
-                    </div>
-                    <div class="flex-1 bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs space-y-1">
-                        <div class="flex justify-between text-slate-400">
-                            <span class="font-semibold text-slate-200">Abhishek Rajan</span>
-                            <span class="text-[10px]">12:10 PM</span>
-                        </div>
-                        <p class="text-slate-300">Completed factory floor inspection. Sourcing batch #402 passed 100% quality check with 0 defects.</p>
-                    </div>
-                </div>
-            </div>
+            <div id="chatFeed" class="chat-feed"></div>
 
-            <!-- Chat Input -->
-            <div class="p-4 border-t border-slate-800 bg-slate-900/50">
-                <form id="chatForm" onsubmit="handleSendMessage(event)" class="flex space-x-2">
-                    <input type="text" id="userInput" placeholder="Type operational update (e.g. Audit completed with 0 defects)..." 
-                           class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
-                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-semibold px-4 py-2 rounded-lg text-xs transition">
-                        Send & Log KPI
-                    </button>
+            <div class="composer">
+                <form id="chatForm">
+                    <input type="text" id="userInput" placeholder="Type operational update (e.g. Audit completed with 0 defects)..." aria-label="Message input">
+                    <button type="submit" class="primary-btn">Send & Log KPI</button>
                 </form>
             </div>
         </main>
 
-        <!-- Right Panel: Real-Time Chat-to-KPI Parser -->
-        <aside class="col-span-4 bg-slate-900/30 p-4 flex flex-col space-y-4">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1 flex items-center justify-between">
-                <span>Chat-to-KPI Engine</span>
-                <span class="text-[10px] text-emerald-400 font-mono">Local Parsing Active</span>
-            </div>
-
-            <!-- Parsed Card Output -->
-            <div id="kpiOutput" class="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs space-y-3">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                    <span class="font-semibold text-emerald-400"><i class="fa-solid fa-chart-line mr-1"></i> Structured Log Extracted</span>
-                    <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Ollama NLP</span>
-                </div>
-                
-                <div class="space-y-2 font-mono text-[11px]">
-                    <div class="flex justify-between">
-                        <span class="text-slate-500">Metric Type:</span>
-                        <span class="text-slate-200" id="kpiMetric">Quality Inspection</span>
+        <aside class="inspector">
+            <div class="inspector-inner">
+                <div class="kpi-panel">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                        <span class="font-semibold text-emerald-400"><i class="fa-solid fa-chart-line mr-1"></i> Chat-to-KPI Engine</span>
+                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Local Parsing</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-500">Unit / Location:</span>
-                        <span class="text-slate-200" id="kpiLocation">Sourcing Batch #402</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-500">Pass Rate:</span>
-                        <span class="text-emerald-400 font-bold" id="kpiScore">100% (0 Defects)</span>
+
+                    <div class="space-y-2 font-mono text-[11px]">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Metric Type:</span>
+                            <span class="text-slate-200" id="kpiMetric">Quality Inspection</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Unit / Location:</span>
+                            <span class="text-slate-200" id="kpiLocation">Sourcing Batch #402</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Pass Rate:</span>
+                            <span class="text-emerald-400 font-bold" id="kpiScore">100% (0 Defects)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Status:</span>
+                            <span class="text-blue-400 font-bold" id="kpiStatus">Verified</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="pt-2 border-t border-slate-800 text-[10px] text-slate-500 flex justify-between">
-                    <span>Audit Time Saved: ~110 mins</span>
-                    <span class="text-purple-400">Zero Cloud Leak</span>
+                <div class="mini-grid">
+                    <div class="mini-card">
+                        <div class="metric-label">Time Reduction</div>
+                        <div class="metric-value text-slate-100">91.6%</div>
+                    </div>
+                    <div class="mini-card">
+                        <div class="metric-label">Data Sovereignty</div>
+                        <div class="metric-value text-emerald-400">100%</div>
+                    </div>
+                    <div class="mini-card">
+                        <div class="metric-label">Ops SLA</div>
+                        <div class="metric-value text-blue-400">98.2%</div>
+                    </div>
+                    <div class="mini-card">
+                        <div class="metric-label">Compliance</div>
+                        <div class="metric-value text-purple-400">98.7%</div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Operational Impact Stats -->
-            <div class="grid grid-cols-2 gap-2 text-center">
-                <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-lg">
-                    <div class="text-lg font-bold text-slate-100">91.6%</div>
-                    <div class="text-[10px] text-slate-500">Time Reduction</div>
-                </div>
-                <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-lg">
-                    <div class="text-lg font-bold text-emerald-400">100%</div>
-                    <div class="text-[10px] text-slate-500">Data Sovereignty</div>
+                <div class="card">
+                    <div class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Recent KPI Ledger</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Result</th>
+                                <th>State</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kpiTableBody">
+                            <tr>
+                                <td>Floor Audit</td>
+                                <td>100%</td>
+                                <td><span class="tag good">Verified</span></td>
+                            </tr>
+                            <tr>
+                                <td>Safety Review</td>
+                                <td>94%</td>
+                                <td><span class="tag warn">Review</span></td>
+                            </tr>
+                            <tr>
+                                <td>Vendor Contract</td>
+                                <td>98%</td>
+                                <td><span class="tag good">Accepted</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </aside>
-
     </div>
 
     <script>
-        function handleSendMessage(e) {
-            e.preventDefault();
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-            if (!text) return;
+        const channelMeta = {
+            'operational-stream': { label: 'Operational Communication Feed', room: 'Local Matrix Room: !ops_main:localhost' },
+            'hr-compliance-mesh': { label: 'HR Compliance Mesh', room: 'Local Matrix Room: !hr_compliance:localhost' },
+            'apparel-sourcing-logistics': { label: 'Apparel Sourcing Logistics', room: 'Local Matrix Room: !sourcing_ops:localhost' },
+            'factory-safety-watch': { label: 'Factory Safety Watch', room: 'Local Matrix Room: !safety_watch:localhost' }
+        };
 
-            // Append to chat feed
+        const data = {
+            'operational-stream': [
+                { author: 'Abhishek Rajan', initials: 'AR', tone: 'system', time: '12:10 PM', text: 'Completed factory floor inspection. Sourcing batch #402 passed 100% quality check with 0 defects.' },
+                { author: 'Operations Desk', initials: 'OD', tone: 'ops', time: '12:14 PM', text: 'Audit cycle closed successfully. Sourcing defect count is zero and dispatch readiness is at 97%.' },
+                { author: 'Factory Lead', initials: 'FL', tone: 'ops', time: '12:26 PM', text: 'Packaging line rebalanced. Production output increased and overtime was reduced by 18%.' }
+            ],
+            'hr-compliance-mesh': [
+                { author: 'HR Ops', initials: 'HR', tone: 'system', time: '10:02 AM', text: 'POSH refresher completed. All team members acknowledged the updated policy guidelines.' },
+                { author: 'Compliance Manager', initials: 'CM', tone: 'ops', time: '10:12 AM', text: 'Incident review completed with no policy breach. The issue was resolved under the escalation matrix.' }
+            ],
+            'apparel-sourcing-logistics': [
+                { author: 'Vendor Desk', initials: 'VD', tone: 'system', time: '08:45 AM', text: 'Fabric batch #1041 shipped on schedule, with 0 quality holds reported by the receiving team.' },
+                { author: 'Logistics Lead', initials: 'LL', tone: 'ops', time: '09:15 AM', text: 'Dock clearance improved by 12%. Late arrivals avoided due to revised route optimization.' }
+            ],
+            'factory-safety-watch': [
+                { author: 'Safety Officer', initials: 'SO', tone: 'system', time: '07:20 AM', text: 'Safety inspection was completed. PPE compliance remains above 99% with no critical incidents.' },
+                { author: 'Shift Supervisor', initials: 'SS', tone: 'ops', time: '07:38 AM', text: 'Guardrail refresh completed and emergency drill scheduled for this evening at 6:00 PM.' }
+            ]
+        };
+
+        const channelState = { current: 'operational-stream' };
+
+        function renderMessages() {
+            const currentMessages = data[channelState.current] || [];
             const feed = document.getElementById('chatFeed');
-            const msgHtml = `
-                <div class="flex items-start space-x-3">
-                    <div class="w-8 h-8 rounded-full bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-bold text-xs">
-                        YOU
-                    </div>
-                    <div class="flex-1 bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs space-y-1">
-                        <div class="flex justify-between text-slate-400">
-                            <span class="font-semibold text-slate-200">Operator</span>
-                            <span class="text-[10px]">Just now</span>
+            feed.innerHTML = currentMessages.map(msg => `
+                <div class="bubble">
+                    <div class="avatar ${msg.tone === 'system' ? 'system' : msg.tone === 'ops' ? 'ops' : 'user'}">${msg.initials}</div>
+                    <div class="message-box">
+                        <div class="meta">
+                            <span class="font-semibold text-slate-200">${msg.author}</span>
+                            <span>${msg.time}</span>
                         </div>
-                        <p class="text-slate-300">${text}</p>
+                        <p class="message-text">${msg.text}</p>
                     </div>
                 </div>
-            `;
-            feed.insertAdjacentHTML('beforeend', msgHtml);
+            `).join('');
 
-            // Dynamically update Chat-to-KPI box based on entry
-            document.getElementById('kpiMetric').innerText = 'Operational Log Entry';
-            document.getElementById('kpiLocation').innerText = 'Local Matrix Feed';
-            document.getElementById('kpiScore').innerText = 'Extracted & Recorded';
+            const room = channelMeta[channelState.current];
+            document.getElementById('roomLabel').textContent = room.label;
+            document.getElementById('roomMeta').textContent = room.room;
 
-            input.value = '';
             feed.scrollTop = feed.scrollHeight;
+            updateKpiFromText(currentMessages[currentMessages.length - 1]?.text || '');
         }
+
+        function parseKpiMessage(text) {
+            const lower = text.toLowerCase();
+            let metricType = 'Operational Update';
+            let location = 'Local Matrix Feed';
+            let passRate = 'Tracked';
+            let status = 'Verified';
+
+            if (lower.includes('inspection') || lower.includes('audit')) {
+                metricType = 'Quality Inspection';
+            } else if (lower.includes('safety')) {
+                metricType = 'Safety Compliance';
+            } else if (lower.includes('vendor') || lower.includes('source') || lower.includes('sourcing')) {
+                metricType = 'Vendor Sourcing';
+            } else if (lower.includes('policy') || lower.includes('compliance')) {
+                metricType = 'Compliance Review';
+            }
+
+            if (lower.includes('batch')) {
+                const match = text.match(/batch\s*#?\d+/i);
+                if (match) location = match[0].replace('#', ' #');
+            } else if (lower.includes('factory')) {
+                location = 'Factory Floor';
+            } else if (lower.includes('dock') || lower.includes('shipping')) {
+                location = 'Logistics Dock';
+            }
+
+            if (lower.includes('0 defects') || lower.includes('zero defects') || lower.includes('100% quality')) {
+                passRate = '100% (0 Defects)';
+            } else if (lower.includes('98%') || lower.includes('98 percent')) {
+                passRate = '98%';
+            } else if (lower.includes('94%')) {
+                passRate = '94%';
+            } else if (lower.includes('late') || lower.includes('delay')) {
+                passRate = 'At Risk';
+                status = 'Escalated';
+            } else if (lower.includes('rebalanced') || lower.includes('improved')) {
+                passRate = 'Improved Output';
+            } else {
+                passRate = 'Logged';
+            }
+
+            if (lower.includes('incident') || lower.includes('breach')) {
+                status = 'Action Required';
+            }
+
+            return { metricType, location, passRate, status };
+        }
+
+        function updateKpiFromText(text) {
+            const parsed = parseKpiMessage(text);
+            document.getElementById('kpiMetric').textContent = parsed.metricType;
+            document.getElementById('kpiLocation').textContent = parsed.location;
+            document.getElementById('kpiScore').textContent = parsed.passRate;
+            document.getElementById('kpiStatus').textContent = parsed.status;
+        }
+
+        document.getElementById('chatForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            const base = {
+                author: 'Operator',
+                initials: 'YOU',
+                tone: 'user',
+                time: 'Just now',
+                text
+            };
+
+            data[channelState.current].push(base);
+            renderMessages();
+            input.value = '';
+
+            const table = document.getElementById('kpiTableBody');
+            const row = document.createElement('tr');
+            const parsed = parseKpiMessage(text);
+            row.innerHTML = `
+                <td>${parsed.metricType}</td>
+                <td>${parsed.passRate}</td>
+                <td><span class="tag ${parsed.status === 'Action Required' ? 'alert' : parsed.status === 'Escalated' ? 'warn' : 'good'}">${parsed.status}</span></td>
+            `;
+            table.prepend(row);
+        });
+
+        document.querySelectorAll('.channel-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.channel-btn').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+                channelState.current = this.dataset.channel;
+                renderMessages();
+            });
+        });
+
+        renderMessages();
     </script>
 </body>
 </html>
