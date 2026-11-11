@@ -1,74 +1,30 @@
-# cap061-bharat-workplace-engine
-SOVEREIGN ENTERPRISE MESH: THE BHARAT WORKPLACE ENGINE
-> **An Open-Source, Zero-Telemetry Architecture for Operational Communication & Automated KPI Logging**
-> 
-> **IIT Delhi – CEP | Design Thinking & Innovation (DTI Batch 10)**  
-> **Capstone Project ID:** CAP-061  
-> **Author:** Abhishek Rajan (Student ID: 110019608)  
-> **Mentors:** Prof. Vijayaraghavan M. Chariar, Primary Sherpa Girish Anand, Backup Sherpa Nalini Murugesan  
-> **License:** `IITD-CEP-DTI10-SOVEREIGN-1.0`
----
-Overview
-Modern enterprise software treats internal communication as an administrative broadcast problem, resulting in unrecorded operational work. The Bharat Workplace Engine bridges operational execution and community trust using a sovereign, pure Free and Open Source Software (FOSS) technical stack.
----
-Operational Architecture
-[ Internal Enterprise Zone ]                  [ External Expert Mesh ]
-(Operations / HR / Legal)                    (Labor Lawyers / POSH)
-│                                           │
-▼                                           ▼
-┌──────────────────────────┐                    ┌──────────────────────────┐
-│   Matrix Synapse /       │◄── Federated ─────►│  Federated Matrix        │
-│   Rocket.Chat Server     │    Encrypted       │  Bridge                  │
-└────────────┬─────────────┘    Gateway         └──────────────────────────┘
-│
-▼
-┌──────────────────────────┐
-│  n8n Middleware          │ (Podman Container Orchestration)
-└────────────┬─────────────┘
-│
-▼
-┌──────────────────────────┐
-│  Ollama Local LLM        │ (Offline Processing: Llama 3 / Mistral)
-│  (Chat-to-KPI Engine)    │
-└──────────────────────────┘
+# Bharat Workplace Engine — CAP-061
 
+A frontend MVP prototype for a sovereign enterprise operations workspace: operational work tracking, chat-to-KPI demo parsing, compliance controls, logistics shipments, safety actions, peer guilds and CSV reports.
 
----
+> **Prototype status:** This repository currently serves a static, browser-only MVP. The records are illustrative demo data, with user-entered changes stored in the browser's `localStorage`. This is not a production collaboration platform, legal/compliance system, emergency reporting channel, or AI-backed KPI engine.
 
-## Core System Modules
+## Run locally
 
-1. **Desi Baithak (Peer-Trust Guilds)**  
-   Non-hierarchical, autonomous micro-guilds (5–15 peers) built for mentorship, operational problem-solving, and workplace psychological safety.
+Open `index.html` directly in a modern browser, or serve this folder with any static web server. The app has no build step or runtime dependencies.
 
-2. **Chat-to-KPI Engine**  
-   Autonomous local AI agent running via Ollama and n8n that parses raw operational chat streams, extracting time-and-motion data to generate structured performance logs. Reduces weekly report preparation time from 120 minutes to under 10 minutes (91% reduction).
+## Included interactions
 
-3. **Three-Tier Contextual Moderation**  
-   * **Tier 1:** Automated expletive masking and channel tone grading.
-   * **Tier 2 (Accidental Post Shield):** Local UI overlays that block informal slang directed at executive channels and prevent unauthorized screenshots.
-   * **Tier 3:** Cryptographic file hash verification to prevent unauthorized data leaks.
+- Navigate between Overview, Operations, Compliance, Logistics, Safety, Reports, Desi Baithak and Workspace Settings.
+- Search tasks, filter work items and change task statuses.
+- Add work items, controls, shipments, safety actions and demo guilds.
+- Capture operational updates with lightweight local keyword suggestions for category, location and status. Suggestions are not AI-generated or verified.
+- Update logistics and safety statuses, and review sample compliance controls.
+- Export demo work items, controls, shipments, safety actions and summary data to CSV.
+- Persist demo changes in browser-local storage and reset to the sample dataset from Workspace Settings.
+- Responsive desktop and mobile layouts; no external UI libraries or analytics scripts are required by the app.
 
----
+## Important limitations and next steps
 
-## Technology Stack
+This frontend does not include authentication, authorization, a server/database, Matrix/Rocket.Chat integration, n8n workflows, Ollama inference, federation, encryption, cryptographic evidence verification, audit-grade retention, or validated DPDP/POSH compliance. Do not enter real employee, sensitive personal, legal, health, incident or confidential business data. The prototype's sample scores and records are not operational measurements.
 
-| Layer | Component | Deployment Model |
-| :--- | :--- | :--- |
-| **Messaging Core** | Matrix Synapse / Rocket.Chat | Self-Hosted / On-Premise |
-| **Orchestration** | n8n Workflows | Local Podman Containers |
-| **Local Intelligence** | Ollama (Llama 3 / Mistral) | Sovereign Air-Gapped Hardware |
-| **Compliance** | DPDP Act 2023 & POSH Framework | Zero External Telemetry |
+A production system needs a reviewed threat model and privacy design, secure identity and role-based access, a backend with data retention/deletion controls, tested integrations, auditable human review of extracted metrics, and jurisdiction-specific legal/compliance review. Avoid using automated message-derived KPIs as the sole basis for individual performance decisions.
 
----
+## Project
 
-## Regulatory & Legal Framework
-
-* **Constitutional Balance:** Harmonizes **Article 19(1)(a)** (freedom of speech) with **Article 19(2)** (reasonable restrictions for decorum and safety).
-* **Data Sovereignty:** 100% on-premise data residency compliant with India's Digital Personal Data Protection (DPDP) Act 2023.
-
----
-
-## Project Artifacts & Links
-
-* **Live Frontend Prototype:** [bharat-workplace-engine.vercel.app](https://bharat-workplace-engine.vercel.app)
-* **Code Repository:** [github.com/hrabhishekrajan/cap061-bharat-workplace-engine](https://github.com/hrabhishekrajan/cap061-bharat-workplace-engine)
+Sovereign Enterprise Mesh & Chat-to-KPI Engine · IIT Delhi CEP DTI Batch 10 · Capstone CAP-061.

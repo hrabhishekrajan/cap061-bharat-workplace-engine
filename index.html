@@ -1,657 +1,134 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bharat Workplace Engine | CAP-061</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script>
-      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-    </script>
-    <script defer src="/_vercel/insights/script.js"></script>
-    <style>
-        :root {
-            --bg: #020817;
-            --panel: #0f172a;
-            --panel-strong: #111827;
-            --panel-soft: #0b1220;
-            --border: rgba(148, 163, 184, 0.2);
-            --text: #e2e8f0;
-            --muted: #94a3b8;
-            --emerald: #34d399;
-            --green-soft: rgba(52, 211, 153, 0.12);
-            --blue: #60a5fa;
-            --purple: #a78bfa;
-            --amber: #fbbf24;
-            --red: #f87171;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: linear-gradient(180deg, #020817 0%, #020817 100%);
-            color: var(--text);
-        }
-
-        .app-shell {
-            display: grid;
-            grid-template-columns: 280px minmax(0, 1.5fr) minmax(340px, 1fr);
-            min-height: calc(100vh - 74px);
-        }
-
-        .sidebar, .inspector {
-            background: rgba(15, 23, 42, 0.78);
-            border-right: 1px solid var(--border);
-        }
-
-        .inspector {
-            border-right: none;
-            border-left: 1px solid var(--border);
-        }
-
-        .sidebar-inner, .inspector-inner {
-            padding: 1rem;
-            height: 100%;
-        }
-
-        .channel-btn {
-            width: 100%;
-            border: 1px solid transparent;
-            background: transparent;
-            color: #cbd5e1;
-            text-align: left;
-            padding: 0.8rem 0.9rem;
-            border-radius: 0.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.45rem;
-            transition: all 0.2s ease;
-        }
-
-        .channel-btn:hover, .channel-btn.active {
-            background: rgba(15, 23, 42, 0.95);
-            border-color: rgba(52, 211, 153, 0.2);
-            color: #d1fae5;
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.35rem 0.7rem;
-            border-radius: 999px;
-            font-size: 0.68rem;
-            border: 1px solid;
-            white-space: nowrap;
-        }
-
-        .status-pill.green {
-            background: rgba(16, 185, 129, 0.1);
-            color: #6ee7b7;
-            border-color: rgba(16, 185, 129, 0.25);
-        }
-
-        .status-pill.blue {
-            background: rgba(96, 165, 250, 0.1);
-            color: #93c5fd;
-            border-color: rgba(96, 165, 250, 0.25);
-        }
-
-        .status-pill.purple {
-            background: rgba(167, 139, 250, 0.1);
-            color: #c4b5fd;
-            border-color: rgba(167, 139, 250, 0.25);
-        }
-
-        .status-dot {
-            width: 0.5rem;
-            height: 0.5rem;
-            border-radius: 999px;
-            display: inline-block;
-            background: currentColor;
-            box-shadow: 0 0 12px currentColor;
-        }
-
-        .card {
-            background: rgba(15, 23, 42, 0.84);
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            padding: 1rem;
-        }
-
-        .feed-panel {
-            background: rgba(2, 8, 23, 0.8);
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-
-        .feed-header {
-            padding: 0.9rem 1rem;
-            border-bottom: 1px solid var(--border);
-            background: rgba(15, 23, 42, 0.35);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-feed {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.1rem 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .bubble {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-        }
-
-        .avatar {
-            width: 2.3rem;
-            height: 2.3rem;
-            border-radius: 0.8rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.65rem;
-            font-weight: 700;
-            border: 1px solid rgba(148, 163, 184, 0.25);
-            flex-shrink: 0;
-        }
-
-        .avatar.user { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border-color: rgba(52, 211, 153, 0.25); }
-        .avatar.system { background: rgba(96, 165, 250, 0.1); color: #93c5fd; border-color: rgba(96, 165, 250, 0.25); }
-        .avatar.ops { background: rgba(167, 139, 250, 0.12); color: #c4b5fd; border-color: rgba(167, 139, 250, 0.25); }
-
-        .message-box {
-            flex: 1;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            padding: 0.8rem 0.9rem;
-        }
-
-        .meta {
-            display: flex;
-            justify-content: space-between;
-            gap: 0.8rem;
-            font-size: 0.72rem;
-            color: #94a3b8;
-            margin-bottom: 0.45rem;
-        }
-
-        .message-text {
-            font-size: 0.8rem;
-            color: #e2e8f0;
-            line-height: 1.6;
-            margin: 0;
-        }
-
-        .composer {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-            background: rgba(15, 23, 42, 0.45);
-        }
-
-        .composer form {
-            display: flex;
-            gap: 0.7rem;
-        }
-
-        .composer input {
-            width: 100%;
-            background: rgba(2, 8, 23, 0.9);
-            border: 1px solid var(--border);
-            border-radius: 0.8rem;
-            color: var(--text);
-            padding: 0.8rem 0.9rem;
-            font-size: 0.8rem;
-            outline: none;
-        }
-
-        .composer input:focus {
-            border-color: rgba(52, 211, 153, 0.45);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.08);
-        }
-
-        .primary-btn {
-            background: linear-gradient(135deg, #34d399, #10b981);
-            color: #022c22;
-            font-weight: 700;
-            border: none;
-            border-radius: 0.8rem;
-            padding: 0.8rem 1rem;
-            cursor: pointer;
-            transition: transform 0.15s ease;
-        }
-
-        .primary-btn:hover { transform: translateY(-1px); }
-
-        .inspector-inner {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .kpi-panel {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            padding: 1rem;
-        }
-
-        .mini-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.7rem;
-        }
-
-        .mini-card {
-            border: 1px solid var(--border);
-            border-radius: 0.9rem;
-            background: rgba(15, 23, 42, 0.75);
-            padding: 0.8rem 0.75rem;
-            text-align: center;
-        }
-
-        .metric-label {
-            font-size: 0.68rem;
-            color: #94a3b8;
-            margin-bottom: 0.35rem;
-        }
-
-        .metric-value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.74rem;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 0.6rem 0.5rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-        }
-
-        th {
-            color: #cbd5e1;
-            font-weight: 600;
-        }
-
-        td {
-            color: #dbeafe;
-        }
-
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 999px;
-            font-size: 0.68rem;
-            padding: 0.2rem 0.55rem;
-            border: 1px solid transparent;
-        }
-
-        .tag.good {
-            background: rgba(16, 185, 129, 0.12);
-            color: #6ee7b7;
-            border-color: rgba(16, 185, 129, 0.25);
-        }
-
-        .tag.warn {
-            background: rgba(251, 191, 36, 0.12);
-            color: #fcd34d;
-            border-color: rgba(251, 191, 36, 0.25);
-        }
-
-        .tag.alert {
-            background: rgba(248, 113, 113, 0.12);
-            color: #fca5a5;
-            border-color: rgba(248, 113, 113, 0.25);
-        }
-
-        @media (max-width: 1180px) {
-            .app-shell {
-                grid-template-columns: 220px 1fr;
-            }
-            .inspector {
-                grid-column: 1 / -1;
-                border-left: none;
-                border-top: 1px solid var(--border);
-            }
-        }
-
-        @media (max-width: 760px) {
-            .app-shell {
-                grid-template-columns: 1fr;
-            }
-            .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
-            .composer form { flex-direction: column; }
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f8fb">
+  <meta name="description" content="Bharat Workplace Engine — sovereign operations, compliance, safety and KPI workspace prototype.">
+  <title>Bharat Workplace Engine · Operations</title>
+  <style>
+    :root{--ink:#17212f;--muted:#758195;--line:#e7ebf1;--bg:#f6f8fb;--paper:#fff;--nav:#111b2b;--green:#14856b;--green-soft:#e7f5f0;--blue:#477be5;--blue-soft:#edf2ff;--amber:#b77814;--amber-soft:#fff5df;--red:#c94c50;--red-soft:#fff0f0;--purple:#7757bc;--purple-soft:#f2edfc;--shadow:0 10px 28px rgba(27,42,66,.055);--radius:14px}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.layout{min-height:100vh;display:grid;grid-template-columns:252px 1fr}.sidebar{background:var(--nav);color:#eaf0f8;padding:22px 15px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}.brand{display:flex;align-items:center;gap:11px;padding:0 10px 23px}.brand-mark{width:37px;height:37px;border-radius:12px;background:linear-gradient(145deg,#42c69c,#14856b);display:grid;place-items:center;color:#fff;font-weight:800;font-size:19px;box-shadow:0 5px 16px #14856b45}.brand strong{display:block;font-size:14px;letter-spacing:-.3px}.brand small{color:#8f9caf;font-size:10px}.nav-label{font-size:10px;font-weight:700;letter-spacing:1.15px;color:#77859a;padding:15px 11px 8px;text-transform:uppercase}.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:#aab5c5;text-align:left;border-radius:9px;padding:10px 11px;display:flex;align-items:center;gap:12px;font-size:13px;transition:.18s}.nav button:hover{background:#ffffff0b;color:#fff}.nav button.active{background:#1b2b3d;color:#81dfbf;box-shadow:inset 3px 0 #48c49a}.nav-icon{width:19px;text-align:center;font-size:15px}.nav-count{margin-left:auto;background:#24344a;border-radius:20px;padding:1px 7px;font-size:10px;color:#c6d1de}.sidebar-bottom{margin-top:auto}.sovereign{border:1px solid #293a4c;background:#172536;border-radius:12px;padding:12px}.sovereign-top{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:650}.online-dot{width:7px;height:7px;background:#48c49a;border-radius:50%;box-shadow:0 0 0 4px #48c49a20}.sovereign p{color:#8393a8;font-size:10px;margin:6px 0 0}.profile{display:flex;align-items:center;gap:9px;padding:14px 7px 0}.avatar{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#e6edfb;color:#4567a7;font-size:10px;font-weight:800;flex:none}.profile strong{display:block;font-size:11px}.profile small{color:#8997aa;font-size:10px}.main{min-width:0}.topbar{height:68px;background:#ffffffd9;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}.breadcrumbs{font-size:12px;color:var(--muted)}.breadcrumbs b{color:var(--ink);font-weight:650}.top-actions{display:flex;align-items:center;gap:10px}.search-wrap{position:relative}.search-wrap span{position:absolute;left:11px;top:8px;color:#8a95a5}.search{width:215px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px 8px 32px;font-size:11px;outline:none}.search:focus{border-color:#9eb8ef;box-shadow:0 0 0 3px #477be515}.icon-btn,.btn{border:1px solid var(--line);background:#fff;border-radius:8px;color:#465267;padding:8px 10px;font-size:11px}.icon-btn{width:34px;height:34px;padding:0;font-size:15px}.btn:hover,.icon-btn:hover{background:#f8fafc}.btn-primary{background:var(--green);border-color:var(--green);color:white;font-weight:650}.btn-primary:hover{background:#0d725a}.content{max-width:1530px;margin:auto;padding:27px 32px 45px}.page-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:16px}.eyebrow{font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--green)}h1{font-size:25px;line-height:1.2;letter-spacing:-.7px;margin:5px 0 6px}.page-head p{margin:0;color:var(--muted);font-size:12px}.head-actions{display:flex;align-items:center;gap:8px}.date-chip{font-size:11px;color:#647085;border:1px solid var(--line);background:#fff;padding:8px 11px;border-radius:8px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:15px}.kpi-card{padding:16px 17px;min-height:122px;position:relative;overflow:hidden}.kpi-top{display:flex;justify-content:space-between;align-items:center;color:#728096;font-size:11px}.kpi-icon{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;font-size:14px}.kpi-value{font-size:26px;font-weight:730;letter-spacing:-1px;margin:8px 0 3px}.kpi-foot{font-size:10px;color:#8a95a5}.trend{color:var(--green);font-weight:650}.trend.warn{color:var(--amber)}.overview-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.85fr);gap:14px;margin-bottom:15px}.panel-head{padding:16px 18px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px}.panel-title{font-size:13px;font-weight:700}.panel-sub{font-size:10px;color:var(--muted);margin-top:3px}.chart-area{padding:8px 18px 16px}.chart-legend{display:flex;gap:16px;font-size:10px;color:#778397}.legend-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}.chart{height:177px;display:flex;align-items:flex-end;justify-content:space-around;gap:12px;padding:14px 6px 0;border-bottom:1px solid var(--line);background:repeating-linear-gradient(to bottom,transparent 0,transparent 43px,#f0f3f7 44px)}.bar-group{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:7px;flex:1;position:relative}.bars{height:140px;display:flex;align-items:flex-end;gap:5px}.bar{width:12px;min-height:4px;border-radius:4px 4px 1px 1px;background:#49b997;transition:height .3s}.bar.secondary{background:#cbd8f6}.bar-label{font-size:9px;color:#8994a4}.legend-dot.green{background:#49b997}.legend-dot.blue{background:#cbd8f6}.chart-note{font-size:9px;color:#8b96a6;margin-top:8px}.health-list{padding:0 18px 14px}.health-item{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid #f0f2f6}.health-item:last-child{border-bottom:0}.health-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;font-size:13px}.health-copy{flex:1;min-width:0}.health-copy strong{display:block;font-size:11px}.health-copy small{color:var(--muted);font-size:9px}.health-score{font-size:12px;font-weight:700}.pill{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 8px;font-size:9px;font-weight:650;white-space:nowrap}.pill.green{background:var(--green-soft);color:var(--green)}.pill.amber{background:var(--amber-soft);color:var(--amber)}.pill.red{background:var(--red-soft);color:var(--red)}.pill.blue{background:var(--blue-soft);color:var(--blue)}.pill.purple{background:var(--purple-soft);color:var(--purple)}.data-panel{overflow:hidden;margin-bottom:15px}.table-toolbar{padding:0 18px 12px;display:flex;justify-content:space-between;align-items:center}.filters{display:flex;gap:6px}.filter-btn{border:1px solid transparent;background:transparent;color:#778397;font-size:10px;border-radius:7px;padding:6px 9px}.filter-btn.selected{color:#315f51;background:#eaf6f2;border-color:#d6eee5;font-weight:650}.table-scroll{overflow:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th{background:#fafbfd;color:#8792a2;font-size:9px;text-transform:uppercase;letter-spacing:.55px;text-align:left;padding:10px 16px;font-weight:650;border-top:1px solid #f0f2f6;border-bottom:1px solid #f0f2f6}td{padding:12px 16px;border-bottom:1px solid #f1f3f6;font-size:10px;color:#596579}tbody tr:last-child td{border-bottom:0}tbody tr:hover{background:#fbfcfe}.task-name{font-weight:650;color:#293548;font-size:10px}.task-detail{color:#98a1af;font-size:9px;margin-top:2px}.owner-cell{display:flex;align-items:center;gap:7px}.tiny-avatar{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#eef2fa;color:#60749a;font-size:8px;font-weight:700}.table-action{border:0;background:transparent;color:#78869b;font-size:17px;padding:2px 6px}.bottom-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:14px}.activity-list{padding:0 18px 10px}.activity{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid #f0f2f6}.activity:last-child{border:0}.activity-mark{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex:none}.activity-text{font-size:10px;color:#657185;line-height:1.45}.activity-text b{color:#293548}.activity-time{display:block;color:#a0a9b6;font-size:9px;margin-top:3px}.action-card{padding:16px}.action-top{display:flex;align-items:center;gap:10px}.action-copy strong{font-size:11px}.action-copy small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.action-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #f0f2f6;font-size:10px}.action-row:last-child{border:0}.view{display:none}.view.active{display:block}.module-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-bottom:15px}.module-card{padding:17px}.module-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}.module-head strong{font-size:12px}.module-head small{display:block;color:var(--muted);font-size:9px}.progress{height:6px;background:#edf0f4;border-radius:20px;overflow:hidden;margin:11px 0 5px}.progress span{height:100%;display:block;background:var(--green);border-radius:20px}.module-number{font-size:23px;font-weight:750;letter-spacing:-.7px}.module-description{font-size:10px;color:var(--muted)}.module-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px}.module-section{margin-bottom:15px}.section-title{font-size:13px;font-weight:700}.section-hint{font-size:10px;color:var(--muted);margin-top:2px}.module-table{margin-top:12px}.report-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px}.report-controls{display:flex;gap:8px}.select{background:white;border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:#526074;font-size:10px}.report-chart{display:grid;grid-template-columns:repeat(7,1fr);align-items:end;height:200px;gap:15px;padding:20px 20px 26px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 47px,#f0f3f7 48px);border-bottom:1px solid var(--line)}.report-column{text-align:center;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:7px}.report-column .bar{width:40px}.report-column small{font-size:9px;color:var(--muted)}.toast{position:fixed;right:24px;bottom:22px;background:#172538;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 12px 35px #0f172a33;font-size:11px;opacity:0;transform:translateY(12px);transition:.22s;pointer-events:none;z-index:20}.toast.show{opacity:1;transform:translateY(0)}.mobile-menu{display:none}.empty-state{text-align:center;color:var(--muted);padding:30px;font-size:11px}
+    @media(max-width:1120px){.layout{grid-template-columns:220px 1fr}.overview-grid{grid-template-columns:1fr}.module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:720px){.layout{display:block}.sidebar{position:fixed;z-index:10;left:-260px;width:252px;transition:left .2s;box-shadow:15px 0 40px #101b2c22}.sidebar.open{left:0}.topbar{height:58px;padding:0 15px}.content{padding:20px 14px 34px}.mobile-menu{display:inline-grid}.breadcrumbs{display:none}.search{width:min(43vw,200px)}.page-head{display:block}.head-actions{margin-top:13px}.kpi-grid{gap:8px}.kpi-card{padding:13px;min-height:112px}.kpi-value{font-size:23px}.bottom-grid{grid-template-columns:1fr}.module-grid{grid-template-columns:1fr}.report-toolbar{align-items:flex-start;flex-direction:column}.report-chart{gap:5px;padding-left:9px;padding-right:9px}.report-column .bar{width:20px}.table-toolbar{align-items:flex-start;flex-direction:column}.filters{flex-wrap:wrap}.date-chip{display:none}}
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-6 py-3 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <div class="h-9 w-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-lg">
-                B
-            </div>
-            <div>
-                <h1 class="font-bold text-slate-100 text-base leading-tight">Bharat Workplace Engine</h1>
-                <p class="text-xs text-slate-400">IIT Delhi DTI-10 · Capstone CAP-061</p>
-            </div>
-        </div>
-
-        <div class="flex items-center space-x-3 text-xs flex-wrap gap-2 justify-end">
-            <span class="status-pill green">
-                <span class="status-dot"></span> Air-Gapped / Zero-Telemetry
-            </span>
-            <span class="status-pill blue">
-                <i class="fa-solid fa-microchip mr-1.5"></i> Ollama Llama3 Local
-            </span>
-            <span class="status-pill purple">
-                DPDP 2023 Shield
-            </span>
-        </div>
-    </header>
-
-    <div class="app-shell">
-        <aside class="sidebar">
-            <div class="sidebar-inner">
-                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 px-2">
-                    Desi Baithak (Peer Guilds)
-                </div>
-
-                <div id="channelList">
-                    <button class="channel-btn active" data-channel="operational-stream">
-                        <span><i class="fa-solid fa-comments mr-2 text-slate-400"></i> # operational-stream</span>
-                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded">Live</span>
-                    </button>
-                    <button class="channel-btn" data-channel="hr-compliance-mesh">
-                        <span><i class="fa-solid fa-shield-halved mr-2 text-slate-500"></i> # hr-compliance-mesh</span>
-                    </button>
-                    <button class="channel-btn" data-channel="apparel-sourcing-logistics">
-                        <span><i class="fa-solid fa-truck-ramp-box mr-2 text-slate-500"></i> # apparel-sourcing-logistics</span>
-                    </button>
-                    <button class="channel-btn" data-channel="factory-safety-watch">
-                        <span><i class="fa-solid fa-hard-hat mr-2 text-slate-500"></i> # factory-safety-watch</span>
-                    </button>
-                </div>
-
-                <div class="mt-6 pt-4 border-t border-slate-800/80">
-                    <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 text-xs space-y-1.5">
-                        <div class="text-slate-300 font-semibold flex items-center justify-between">
-                            <span>Local Agent Status</span>
-                            <span class="text-emerald-400">Podman Active</span>
-                        </div>
-                        <p class="text-slate-500 text-[11px]">n8n Workflow + Matrix Synapse Gateway</p>
-                        <div class="flex justify-between text-[10px] text-slate-500">
-                            <span>LLM</span>
-                            <span class="text-emerald-400">Llama 3</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <main class="feed-panel">
-            <div class="feed-header">
-                <span class="text-xs font-semibold text-slate-300" id="roomLabel">Operational Communication Feed</span>
-                <span class="text-[11px] text-slate-500" id="roomMeta">Local Matrix Room: !ops_main:localhost</span>
-            </div>
-
-            <div id="chatFeed" class="chat-feed"></div>
-
-            <div class="composer">
-                <form id="chatForm">
-                    <input type="text" id="userInput" placeholder="Type operational update (e.g. Audit completed with 0 defects)..." aria-label="Message input">
-                    <button type="submit" class="primary-btn">Send & Log KPI</button>
-                </form>
-            </div>
-        </main>
-
-        <aside class="inspector">
-            <div class="inspector-inner">
-                <div class="kpi-panel">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
-                        <span class="font-semibold text-emerald-400"><i class="fa-solid fa-chart-line mr-1"></i> Chat-to-KPI Engine</span>
-                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Local Parsing</span>
-                    </div>
-
-                    <div class="space-y-2 font-mono text-[11px]">
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Metric Type:</span>
-                            <span class="text-slate-200" id="kpiMetric">Quality Inspection</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Unit / Location:</span>
-                            <span class="text-slate-200" id="kpiLocation">Sourcing Batch #402</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Pass Rate:</span>
-                            <span class="text-emerald-400 font-bold" id="kpiScore">100% (0 Defects)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Status:</span>
-                            <span class="text-blue-400 font-bold" id="kpiStatus">Verified</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mini-grid">
-                    <div class="mini-card">
-                        <div class="metric-label">Time Reduction</div>
-                        <div class="metric-value text-slate-100">91.6%</div>
-                    </div>
-                    <div class="mini-card">
-                        <div class="metric-label">Data Sovereignty</div>
-                        <div class="metric-value text-emerald-400">100%</div>
-                    </div>
-                    <div class="mini-card">
-                        <div class="metric-label">Ops SLA</div>
-                        <div class="metric-value text-blue-400">98.2%</div>
-                    </div>
-                    <div class="mini-card">
-                        <div class="metric-label">Compliance</div>
-                        <div class="metric-value text-purple-400">98.7%</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Recent KPI Ledger</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Task</th>
-                                <th>Result</th>
-                                <th>State</th>
-                            </tr>
-                        </thead>
-                        <tbody id="kpiTableBody">
-                            <tr>
-                                <td>Floor Audit</td>
-                                <td>100%</td>
-                                <td><span class="tag good">Verified</span></td>
-                            </tr>
-                            <tr>
-                                <td>Safety Review</td>
-                                <td>94%</td>
-                                <td><span class="tag warn">Review</span></td>
-                            </tr>
-                            <tr>
-                                <td>Vendor Contract</td>
-                                <td>98%</td>
-                                <td><span class="tag good">Accepted</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </aside>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">B</div><div><strong>Bharat Workplace</strong><small>ENTERPRISE WORKSPACE</small></div></div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav" aria-label="Main navigation">
+      <button class="active" data-view="overview"><span class="nav-icon">◫</span>Overview</button>
+      <button data-view="operations"><span class="nav-icon">◉</span>Operations <span class="nav-count">12</span></button>
+      <button data-view="compliance"><span class="nav-icon">⬡</span>Compliance <span class="nav-count">3</span></button>
+      <button data-view="logistics"><span class="nav-icon">▣</span>Logistics</button>
+      <button data-view="safety"><span class="nav-icon">◇</span>Safety <span class="nav-count">2</span></button>
+      <button data-view="reports"><span class="nav-icon">▤</span>Reports</button>
+    </nav>
+    <div class="nav-label">Manage</div>
+    <nav class="nav">
+      <button data-view="guilds"><span class="nav-icon">◎</span>Desi Baithak</button>
+      <button data-view="settings"><span class="nav-icon">⚙</span>Workspace settings</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sovereign"><div class="sovereign-top"><span>Local workspace</span><span class="online-dot" aria-label="Online"></span></div><p>Demo data stored on this device only.</p></div>
+      <div class="profile"><div class="avatar">AR</div><div><strong>Abhishek Rajan</strong><small>Workspace admin</small></div></div>
     </div>
-
-    <script>
-        const channelMeta = {
-            'operational-stream': { label: 'Operational Communication Feed', room: 'Local Matrix Room: !ops_main:localhost' },
-            'hr-compliance-mesh': { label: 'HR Compliance Mesh', room: 'Local Matrix Room: !hr_compliance:localhost' },
-            'apparel-sourcing-logistics': { label: 'Apparel Sourcing Logistics', room: 'Local Matrix Room: !sourcing_ops:localhost' },
-            'factory-safety-watch': { label: 'Factory Safety Watch', room: 'Local Matrix Room: !safety_watch:localhost' }
-        };
-
-        const data = {
-            'operational-stream': [
-                { author: 'Abhishek Rajan', initials: 'AR', tone: 'system', time: '12:10 PM', text: 'Completed factory floor inspection. Sourcing batch #402 passed 100% quality check with 0 defects.' },
-                { author: 'Operations Desk', initials: 'OD', tone: 'ops', time: '12:14 PM', text: 'Audit cycle closed successfully. Sourcing defect count is zero and dispatch readiness is at 97%.' },
-                { author: 'Factory Lead', initials: 'FL', tone: 'ops', time: '12:26 PM', text: 'Packaging line rebalanced. Production output increased and overtime was reduced by 18%.' }
-            ],
-            'hr-compliance-mesh': [
-                { author: 'HR Ops', initials: 'HR', tone: 'system', time: '10:02 AM', text: 'POSH refresher completed. All team members acknowledged the updated policy guidelines.' },
-                { author: 'Compliance Manager', initials: 'CM', tone: 'ops', time: '10:12 AM', text: 'Incident review completed with no policy breach. The issue was resolved under the escalation matrix.' }
-            ],
-            'apparel-sourcing-logistics': [
-                { author: 'Vendor Desk', initials: 'VD', tone: 'system', time: '08:45 AM', text: 'Fabric batch #1041 shipped on schedule, with 0 quality holds reported by the receiving team.' },
-                { author: 'Logistics Lead', initials: 'LL', tone: 'ops', time: '09:15 AM', text: 'Dock clearance improved by 12%. Late arrivals avoided due to revised route optimization.' }
-            ],
-            'factory-safety-watch': [
-                { author: 'Safety Officer', initials: 'SO', tone: 'system', time: '07:20 AM', text: 'Safety inspection was completed. PPE compliance remains above 99% with no critical incidents.' },
-                { author: 'Shift Supervisor', initials: 'SS', tone: 'ops', time: '07:38 AM', text: 'Guardrail refresh completed and emergency drill scheduled for this evening at 6:00 PM.' }
-            ]
-        };
-
-        const channelState = { current: 'operational-stream' };
-
-        function renderMessages() {
-            const currentMessages = data[channelState.current] || [];
-            const feed = document.getElementById('chatFeed');
-            feed.innerHTML = currentMessages.map(msg => `
-                <div class="bubble">
-                    <div class="avatar ${msg.tone === 'system' ? 'system' : msg.tone === 'ops' ? 'ops' : 'user'}">${msg.initials}</div>
-                    <div class="message-box">
-                        <div class="meta">
-                            <span class="font-semibold text-slate-200">${msg.author}</span>
-                            <span>${msg.time}</span>
-                        </div>
-                        <p class="message-text">${msg.text}</p>
-                    </div>
-                </div>
-            `).join('');
-
-            const room = channelMeta[channelState.current];
-            document.getElementById('roomLabel').textContent = room.label;
-            document.getElementById('roomMeta').textContent = room.room;
-
-            feed.scrollTop = feed.scrollHeight;
-            updateKpiFromText(currentMessages[currentMessages.length - 1]?.text || '');
-        }
-
-        function parseKpiMessage(text) {
-            const lower = text.toLowerCase();
-            let metricType = 'Operational Update';
-            let location = 'Local Matrix Feed';
-            let passRate = 'Tracked';
-            let status = 'Verified';
-
-            if (lower.includes('inspection') || lower.includes('audit')) {
-                metricType = 'Quality Inspection';
-            } else if (lower.includes('safety')) {
-                metricType = 'Safety Compliance';
-            } else if (lower.includes('vendor') || lower.includes('source') || lower.includes('sourcing')) {
-                metricType = 'Vendor Sourcing';
-            } else if (lower.includes('policy') || lower.includes('compliance')) {
-                metricType = 'Compliance Review';
-            }
-
-            if (lower.includes('batch')) {
-                const match = text.match(/batch\s*#?\d+/i);
-                if (match) location = match[0].replace('#', ' #');
-            } else if (lower.includes('factory')) {
-                location = 'Factory Floor';
-            } else if (lower.includes('dock') || lower.includes('shipping')) {
-                location = 'Logistics Dock';
-            }
-
-            if (lower.includes('0 defects') || lower.includes('zero defects') || lower.includes('100% quality')) {
-                passRate = '100% (0 Defects)';
-            } else if (lower.includes('98%') || lower.includes('98 percent')) {
-                passRate = '98%';
-            } else if (lower.includes('94%')) {
-                passRate = '94%';
-            } else if (lower.includes('late') || lower.includes('delay')) {
-                passRate = 'At Risk';
-                status = 'Escalated';
-            } else if (lower.includes('rebalanced') || lower.includes('improved')) {
-                passRate = 'Improved Output';
-            } else {
-                passRate = 'Logged';
-            }
-
-            if (lower.includes('incident') || lower.includes('breach')) {
-                status = 'Action Required';
-            }
-
-            return { metricType, location, passRate, status };
-        }
-
-        function updateKpiFromText(text) {
-            const parsed = parseKpiMessage(text);
-            document.getElementById('kpiMetric').textContent = parsed.metricType;
-            document.getElementById('kpiLocation').textContent = parsed.location;
-            document.getElementById('kpiScore').textContent = parsed.passRate;
-            document.getElementById('kpiStatus').textContent = parsed.status;
-        }
-
-        document.getElementById('chatForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-
-            if (!text) return;
-
-            const base = {
-                author: 'Operator',
-                initials: 'YOU',
-                tone: 'user',
-                time: 'Just now',
-                text
-            };
-
-            data[channelState.current].push(base);
-            renderMessages();
-            input.value = '';
-
-            const table = document.getElementById('kpiTableBody');
-            const row = document.createElement('tr');
-            const parsed = parseKpiMessage(text);
-            row.innerHTML = `
-                <td>${parsed.metricType}</td>
-                <td>${parsed.passRate}</td>
-                <td><span class="tag ${parsed.status === 'Action Required' ? 'alert' : parsed.status === 'Escalated' ? 'warn' : 'good'}">${parsed.status}</span></td>
-            `;
-            table.prepend(row);
-        });
-
-        document.querySelectorAll('.channel-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('.channel-btn').forEach(el => el.classList.remove('active'));
-                this.classList.add('active');
-                channelState.current = this.dataset.channel;
-                renderMessages();
-            });
-        });
-
-        renderMessages();
-    </script>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="top-actions"><button class="icon-btn mobile-menu" id="menuToggle" aria-label="Open menu">☰</button><div class="breadcrumbs">Bharat Workplace&nbsp; / &nbsp;<b id="crumb">Overview</b></div></div><div class="top-actions"><label class="search-wrap"><span>⌕</span><input id="globalSearch" class="search" type="search" placeholder="Search tasks, people..." aria-label="Search"></label><button class="icon-btn" id="notifyBtn" aria-label="Notifications">♧</button><button class="btn btn-primary" id="quickAdd">＋ New update</button></div></header>
+    <div class="content">
+      <section class="view active" id="view-overview">
+        <div class="page-head"><div><div class="eyebrow">Tuesday, 11 November 2026</div><h1>Good morning, Abhishek <span style="font-size:21px">☀</span></h1><p>Here’s what’s happening across your workplace today.</p></div><div class="head-actions"><span class="date-chip">◷ &nbsp; Today · IST</span><button class="btn" id="exportOverview">⇩ &nbsp; Export</button></div></div>
+        <div class="kpi-grid">
+          <article class="panel kpi-card"><div class="kpi-top"><span>Operational throughput</span><span class="kpi-icon" style="background:var(--green-soft);color:var(--green)">↗</span></div><div class="kpi-value">1,284</div><div class="kpi-foot"><span class="trend">↑ 8.4%</span> vs last week</div></article>
+          <article class="panel kpi-card"><div class="kpi-top"><span>Tasks completed</span><span class="kpi-icon" style="background:var(--blue-soft);color:var(--blue)">✓</span></div><div class="kpi-value" id="completedKpi">86.2%</div><div class="kpi-foot"><span class="trend">↑ 3.1%</span> completion rate</div></article>
+          <article class="panel kpi-card"><div class="kpi-top"><span>Compliance score</span><span class="kpi-icon" style="background:var(--purple-soft);color:var(--purple)">⬡</span></div><div class="kpi-value">98.7%</div><div class="kpi-foot"><span class="trend">↑ 0.6%</span> across 12 controls</div></article>
+          <article class="panel kpi-card"><div class="kpi-top"><span>Open safety actions</span><span class="kpi-icon" style="background:var(--amber-soft);color:var(--amber)">◇</span></div><div class="kpi-value" id="safetyCount">02</div><div class="kpi-foot"><span class="trend warn">1 due today</span> · all sites</div></article>
+        </div>
+        <div class="overview-grid">
+          <article class="panel"><div class="panel-head"><div><div class="panel-title">Workplace performance</div><div class="panel-sub">Completed work items · last 7 days</div></div><div class="chart-legend"><span><i class="legend-dot green"></i>Completed</span><span><i class="legend-dot blue"></i>Target</span></div></div><div class="chart-area"><div class="chart" id="performanceChart"></div><div class="chart-note">Daily completion trend · sample operational data</div></div></article>
+          <article class="panel"><div class="panel-head"><div><div class="panel-title">Workspace health</div><div class="panel-sub">Signals from your operational modules</div></div><span class="pill green">● Healthy</span></div><div class="health-list">
+            <div class="health-item"><span class="health-icon" style="background:var(--green-soft);color:var(--green)">◉</span><div class="health-copy"><strong>Operations</strong><small>86% tasks on track</small></div><span class="health-score">86%</span></div>
+            <div class="health-item"><span class="health-icon" style="background:var(--purple-soft);color:var(--purple)">⬡</span><div class="health-copy"><strong>Compliance</strong><small>1 control needs review</small></div><span class="health-score">98.7%</span></div>
+            <div class="health-item"><span class="health-icon" style="background:var(--blue-soft);color:var(--blue)">▣</span><div class="health-copy"><strong>Logistics</strong><small>2 shipments in transit</small></div><span class="health-score">94%</span></div>
+            <div class="health-item"><span class="health-icon" style="background:var(--amber-soft);color:var(--amber)">◇</span><div class="health-copy"><strong>Safety</strong><small>2 actions remain open</small></div><span class="health-score">92%</span></div>
+          </div></article>
+        </div>
+        <article class="panel data-panel"><div class="panel-head"><div><div class="panel-title">Priority work</div><div class="panel-sub">Tasks that need attention across your teams</div></div><button class="btn" data-goto="operations">View all tasks &nbsp; →</button></div><div class="table-toolbar"><div class="filters"><button class="filter-btn selected" data-filter="all">All items</button><button class="filter-btn" data-filter="Open">Open</button><button class="filter-btn" data-filter="In progress">In progress</button><button class="filter-btn" data-filter="Review">Review</button></div><span style="font-size:10px;color:#8c97a6">Updated just now</span></div><div class="table-scroll"><table><thead><tr><th>Work item</th><th>Owner</th><th>Due</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody id="taskTable"></tbody></table></div></article>
+        <div class="bottom-grid"><article class="panel"><div class="panel-head"><div><div class="panel-title">Recent activity</div><div class="panel-sub">Updates from your workplace</div></div><button class="btn" data-goto="operations">View feed →</button></div><div class="activity-list" id="activityList"></div></article><article class="panel"><div class="panel-head"><div><div class="panel-title">Needs your attention</div><div class="panel-sub">Suggested next steps</div></div></div><div class="action-card"><div class="action-row"><span>Review vendor documentation</span><span class="pill amber">Due today</span></div><div class="action-row"><span>Close safety action · Pune</span><span class="pill red">Overdue</span></div><div class="action-row"><span>Approve POSH training evidence</span><button class="btn" data-goto="compliance">Review</button></div></div></article></div>
+      </section>
+      <section class="view" id="view-operations"><div class="page-head"><div><div class="eyebrow">WORKSPACE MODULE</div><h1>Operations</h1><p>Coordinate work, capture updates and turn team activity into useful KPIs.</p></div><div class="head-actions"><button class="btn btn-primary" id="newTask">＋ Add task</button></div></div><div class="kpi-grid"><article class="panel kpi-card"><div class="kpi-top"><span>Active work items</span><span class="kpi-icon" style="background:var(--blue-soft);color:var(--blue)">◉</span></div><div class="kpi-value" id="activeTasks">12</div><div class="kpi-foot">Across 4 operating teams</div></article><article class="panel kpi-card"><div class="kpi-top"><span>On-time completion</span><span class="kpi-icon" style="background:var(--green-soft);color:var(--green)">✓</span></div><div class="kpi-value">86.2%</div><div class="kpi-foot"><span class="trend">↑ 3.1%</span> week over week</div></article><article class="panel kpi-card"><div class="kpi-top"><span>Work updates today</span><span class="kpi-icon" style="background:var(--purple-soft);color:var(--purple)">↗</span></div><div class="kpi-value" id="updateCount">24</div><div class="kpi-foot">Captured in local activity feed</div></article><article class="panel kpi-card"><div class="kpi-top"><span>Team response time</span><span class="kpi-icon" style="background:var(--amber-soft);color:var(--amber)">◷</span></div><div class="kpi-value">18m</div><div class="kpi-foot"><span class="trend">↓ 6m</span> median response</div></article></div><article class="panel data-panel"><div class="panel-head"><div><div class="panel-title">Operational workboard</div><div class="panel-sub">Use the status control to update a work item.</div></div><div class="filters"><button class="filter-btn selected" data-filter="all">All</button><button class="filter-btn" data-filter="Open">Open</button><button class="filter-btn" data-filter="In progress">In progress</button><button class="filter-btn" data-filter="Review">Review</button></div></div><div class="table-scroll"><table><thead><tr><th>Work item</th><th>Owner</th><th>Due</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody id="operationsTable"></tbody></table></div></article><article class="panel" style="padding:16px;margin-top:14px"><div class="panel-title">Chat-to-KPI · operational update</div><div class="panel-sub" style="margin-bottom:12px">This local prototype extracts a suggested category, location, and status from the text you enter. Review before treating as a verified record.</div><form id="updateForm" style="display:flex;gap:9px"><input id="updateInput" class="search" style="width:100%;padding:10px" placeholder="e.g. Batch 402 quality inspection passed with 0 defects" aria-label="Operational update text"><button class="btn btn-primary">Capture update</button></form><div id="latestParsed" style="display:none;margin-top:12px;padding:12px;border-radius:9px;background:#f5faf8;font-size:10px"></div></article></section>
+      <section class="view" id="view-compliance"><div class="page-head"><div><div class="eyebrow">CONTROL & GOVERNANCE</div><h1>Compliance</h1><p>Track training, evidence and review checkpoints for your organization.</p></div><div class="head-actions"><button class="btn" id="complianceExport">⇩ Export controls</button><button class="btn btn-primary" id="addControl">＋ Add control</button></div></div><div class="module-grid"><article class="panel module-card"><div class="module-head"><span class="kpi-icon" style="background:var(--purple-soft);color:var(--purple)">⬡</span><div><strong>Overall readiness</strong><small>Across tracked controls</small></div></div><div class="module-number">98.7%</div><div class="progress"><span style="width:98.7%"></span></div><div class="module-footer"><span class="module-description">12 controls tracked</span><span class="pill green">On track</span></div></article><article class="panel module-card"><div class="module-head"><span class="kpi-icon" style="background:var(--blue-soft);color:var(--blue)">▤</span><div><strong>Training completion</strong><small>Required workplace training</small></div></div><div class="module-number">94.2%</div><div class="progress"><span style="width:94.2%;background:var(--blue)"></span></div><div class="module-footer"><span class="module-description">1,184 of 1,257 people</span><span class="pill blue">73 remaining</span></div></article><article class="panel module-card"><div class="module-head"><span class="kpi-icon" style="background:var(--amber-soft);color:var(--amber)">◷</span><div><strong>Evidence reviews</strong><small>Items awaiting verification</small></div></div><div class="module-number">03</div><div class="module-footer"><span class="module-description">Oldest request · 2 days</span><span class="pill amber">Needs review</span></div></article></div><article class="panel data-panel module-section"><div class="panel-head"><div><div class="section-title">Control register</div><div class="section-hint">Sample controls for product demonstration. Not legal or compliance advice.</div></div></div><div class="table-scroll"><table><thead><tr><th>Control</th><th>Owner</th><th>Evidence due</th><th>Coverage</th><th>Status</th><th>Action</th></tr></thead><tbody id="complianceTable"></tbody></table></div></article><article class="panel data-panel"><div class="panel-head"><div><div class="section-title">Training by site</div><div class="section-hint">Completion snapshot · sample operational data</div></div></div><div class="table-scroll"><table><thead><tr><th>Site</th><th>Assigned</th><th>Completed</th><th>Completion</th><th>Follow-up</th></tr></thead><tbody><tr><td class="task-name">Mumbai HQ</td><td>412</td><td>401</td><td>97.3%</td><td><span class="pill green">On track</span></td></tr><tr><td class="task-name">Pune Factory</td><td>528</td><td>481</td><td>91.1%</td><td><span class="pill amber">47 pending</span></td></tr><tr><td class="task-name">Bengaluru Hub</td><td>317</td><td>302</td><td>95.3%</td><td><span class="pill green">On track</span></td></tr></tbody></table></div></article></section>
+      <section class="view" id="view-logistics"><div class="page-head"><div><div class="eyebrow">SUPPLY NETWORK</div><h1>Logistics</h1><p>Monitor inbound and outbound shipments, vendor readiness and delivery exceptions.</p></div><div class="head-actions"><button class="btn" id="logisticsExport">⇩ Export manifest</button><button class="btn btn-primary" id="addShipment">＋ Add shipment</button></div></div><div class="kpi-grid"><article class="panel kpi-card"><div class="kpi-top"><span>In transit</span><span class="kpi-icon" style="background:var(--blue-soft);color:var(--blue)">▣</span></div><div class="kpi-value" id="transitCount">02</div><div class="kpi-foot">Across 3 receiving sites</div></article><article class="panel kpi-card"><div class="kpi-top"><span>On-time delivery</span><span class="kpi-icon" style="background:var(--green-soft);color:var(--green)">✓</span></div><div class="kpi-value">94.0%</div><div class="kpi-foot"><span class="trend">↑ 2.2%</span> last 30 days</div></article><article class="panel kpi-card"><div class="kpi-top"><span>Vendor readiness</span><span class="kpi-icon" style="background:var(--purple-soft);color:var(--purple)">◎</span></div><div class="kpi-value">87.5%</div><div class="kpi-foot">7 of 8 vendors cleared</div></article><article class="panel kpi-card"><div class="kpi-top"><span>Exceptions</span><span class="kpi-icon" style="background:var(--amber-soft);color:var(--amber)">!</span></div><div class="kpi-value" id="exceptionCount">01</div><div class="kpi-foot">One delivery needs follow-up</div></article></div><article class="panel data-panel"><div class="panel-head"><div><div class="section-title">Shipment tracker</div><div class="section-hint">Update a shipment state using the action menu.</div></div><span class="pill blue">Live demo board</span></div><div class="table-scroll"><table><thead><tr><th>Shipment</th><th>Vendor / Route</th><th>ETA</th><th>Quantity</th><th>State</th><th>Update</th></tr></thead><tbody id="shipmentTable"></tbody></table></div></article><article class="panel" style="padding:16px;margin-top:14px"><div class="section-title">Network overview</div><div class="section-hint">Sample lanes · no live carrier connection</div><div class="module-grid" style="margin:14px 0 0"><div class="action-card" style="background:#fafbfd;border-radius:10px"><div class="module-description">WESTERN LANE</div><div style="font-weight:700;margin:5px 0">Mumbai → Pune</div><span class="pill green">Normal · 4h 20m</span></div><div class="action-card" style="background:#fafbfd;border-radius:10px"><div class="module-description">SOUTHERN LANE</div><div style="font-weight:700;margin:5px 0">Bengaluru → Chennai</div><span class="pill amber">Traffic · +45m</span></div><div class="action-card" style="background:#fafbfd;border-radius:10px"><div class="module-description">NORTHERN LANE</div><div style="font-weight:700;margin:5px 0">Delhi → Jaipur</div><span class="pill green">Normal · 5h 10m</span></div></div></article></section>
+      <section class="view" id="view-safety"><div class="page-head"><div><div class="eyebrow">PEOPLE & WORKPLACE</div><h1>Safety</h1><p>Record hazards, assign corrective actions and follow up on inspections.</p></div><div class="head-actions"><button class="btn" id="safetyExport">⇩ Export log</button><button class="btn btn-primary" id="reportIncident">＋ Report an incident</button></div></div><div class="kpi-grid"><article class="panel kpi-card"><div class="kpi-top"><span>Days without lost-time incident</span><span class="kpi-icon" style="background:var(--green-soft);color:var(--green)">✓</span></div><div class="kpi-value">146</div><div class="kpi-foot">Across all active locations</div></article><article class="panel kpi-card"><div class="kpi-top"><span>Open corrective actions</span><span class="kpi-icon" style="background:var(--amber-soft);color:var(--amber)">◇</span></div><div class="kpi-value" id="openSafety">02</div><div class="kpi-foot"><span class="trend warn">1 due today</span> needs follow-up</div></article><article class="panel kpi-card"><div class="kpi-top"><span>Inspection completion</span><span class="kpi-icon" style="background:var(--blue-soft);color:var(--blue)">▤</span></div><div class="kpi-value">96.4%</div><div class="kpi-foot">27 of 28 site checks complete</div></article><article class="panel kpi-card"><div class="kpi-top"><span>PPE compliance</span><span class="kpi-icon" style="background:var(--purple-soft);color:var(--purple)">⬡</span></div><div class="kpi-value">99.1%</div><div class="kpi-foot">Latest site audit · Pune</div></article></div><article class="panel data-panel"><div class="panel-head"><div><div class="section-title">Safety action register</div><div class="section-hint">Track hazards and corrective actions. Sensitive incidents should use approved private reporting channels.</div></div></div><div class="table-scroll"><table><thead><tr><th>Action / observation</th><th>Site</th><th>Reported</th><th>Owner</th><th>Risk</th><th>Status</th><th></th></tr></thead><tbody id="safetyTable"></tbody></table></div></article><article class="panel" style="margin-top:14px"><div class="panel-head"><div><div class="section-title">Safety moment</div><div class="section-hint">Team reminder from the weekly safety plan</div></div><span class="pill green">This week</span></div><div style="padding:0 18px 18px;font-size:11px;color:#657185">Keep emergency exits clear and report blocked access promptly to your site safety lead. This workspace is a prototype, not an emergency service.</div></article></section>
+      <section class="view" id="view-reports"><div class="page-head"><div><div class="eyebrow">INSIGHTS & EXPORTS</div><h1>Reports</h1><p>Review operational trends and export the local demo records for analysis.</p></div><div class="head-actions"><button class="btn btn-primary" id="reportDownload">⇩ Download CSV</button></div></div><div class="panel" style="margin-bottom:15px"><div class="panel-head report-toolbar"><div><div class="section-title">Work completion trend</div><div class="section-hint">Sample weekly work items by operational category</div></div><div class="report-controls"><select class="select" id="reportPeriod" aria-label="Report period"><option>Last 7 days</option><option>Last 30 days</option></select><select class="select" id="reportCategory" aria-label="Report category"><option>All modules</option><option>Operations</option><option>Compliance</option><option>Logistics</option><option>Safety</option></select></div></div><div class="report-chart" id="reportChart"></div><div style="padding:0 20px 15px;color:#8994a4;font-size:9px">Values are illustrative demo data. Export includes current in-browser work items, updates, shipments and safety actions.</div></div><div class="module-grid"><article class="panel module-card"><div class="module-head"><span class="kpi-icon" style="background:var(--green-soft);color:var(--green)">◉</span><div><strong>Operations digest</strong><small>Task status snapshot</small></div></div><div class="module-description">Review open, active and completed tasks with ownership and due dates.</div><div class="module-footer"><span class="module-description">Updated today</span><button class="btn" data-export="tasks">Export</button></div></article><article class="panel module-card"><div class="module-head"><span class="kpi-icon" style="background:var(--purple-soft);color:var(--purple)">⬡</span><div><strong>Compliance register</strong><small>Evidence readiness</small></div></div><div class="module-description">Export control owners, review dates and sample completion status.</div><div class="module-footer"><span class="module-description">12 controls tracked</span><button class="btn" data-export="compliance">Export</button></div></article><article class="panel module-card"><div class="module-head"><span class="kpi-icon" style="background:var(--blue-soft);color:var(--blue)">▣</span><div><strong>Logistics manifest</strong><small>Shipment snapshot</small></div></div><div class="module-description">Download a lightweight CSV manifest of demo shipment records.</div><div class="module-footer"><span class="module-description">3 shipments</span><button class="btn" data-export="shipments">Export</button></div></article></div></section>
+      <section class="view" id="view-guilds"><div class="page-head"><div><div class="eyebrow">PEER-TRUST GUILDS</div><h1>Desi Baithak</h1><p>Small peer groups for mentorship, operational problem-solving and shared learning.</p></div><div class="head-actions"><button class="btn btn-primary" id="newGuild">＋ Create guild</button></div></div><div class="module-grid" id="guildGrid"></div><article class="panel"><div class="panel-head"><div><div class="section-title">Guild guidelines</div><div class="section-hint">Practical defaults for a healthy, inclusive peer space.</div></div></div><div style="padding:0 18px 18px;font-size:11px;color:#667286;line-height:1.9">Keep groups small and voluntary · Share only information you are authorized to discuss · Make room for respectful disagreement · Do not use automated KPI extraction as a substitute for human judgement or employee evaluation.</div></article></section>
+      <section class="view" id="view-settings"><div class="page-head"><div><div class="eyebrow">WORKSPACE MANAGEMENT</div><h1>Workspace settings</h1><p>Prototype settings and data controls for this browser-based demo.</p></div></div><div class="module-grid"><article class="panel module-card"><div class="section-title">Data storage</div><div class="section-hint" style="margin:5px 0 14px">Demo messages and task changes are stored in this browser’s local storage.</div><span class="pill green">Local browser storage</span><div class="module-footer"><span class="module-description">No application backend connected</span><button class="btn" id="clearDemo">Reset demo data</button></div></article><article class="panel module-card"><div class="section-title">Integrations</div><div class="section-hint" style="margin:5px 0 14px">Messaging, identity, local AI and workflow services are not connected in this frontend-only MVP.</div><div class="action-row"><span>Matrix / Synapse</span><span class="pill amber">Not connected</span></div><div class="action-row"><span>Ollama local model</span><span class="pill amber">Not connected</span></div><div class="action-row"><span>n8n workflows</span><span class="pill amber">Not connected</span></div></article><article class="panel module-card"><div class="section-title">Privacy note</div><div class="section-hint" style="margin-top:6px">This static demo has no app backend or external analytics. Your browser may still load this site through its hosting provider. Do not enter real employee, incident or sensitive personal data.</div></article></div></section>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  const seed={tasks:[
+    {id:1,name:'Review vendor quality audit',detail:'Sourcing · Batch #402',owner:'Priya Sharma',initials:'PS',due:'Today, 4:00 PM',priority:'High',status:'Review'},
+    {id:2,name:'Complete floor safety walkthrough',detail:'Pune Factory · Shift B',owner:'Arjun Mehta',initials:'AM',due:'Today, 5:30 PM',priority:'High',status:'In progress'},
+    {id:3,name:'Reconcile inbound shipment documents',detail:'Logistics · PO-7841',owner:'Neha Kapoor',initials:'NK',due:'12 Nov',priority:'Medium',status:'Open'},
+    {id:4,name:'Publish weekly operations summary',detail:'Operations · Week 46',owner:'Rohan Das',initials:'RD',due:'13 Nov',priority:'Low',status:'Open'},
+    {id:5,name:'Verify training acknowledgement',detail:'HR Compliance · Mumbai HQ',owner:'Kavya Iyer',initials:'KI',due:'14 Nov',priority:'Medium',status:'In progress'},
+    {id:6,name:'Close corrective action: exit signage',detail:'Safety · Pune Factory',owner:'Arjun Mehta',initials:'AM',due:'Overdue · 10 Nov',priority:'High',status:'Open'}
+  ], updates:[
+    {author:'Abhishek Rajan',initials:'AR',text:'Factory floor inspection completed. Batch #402 passed quality check with 0 defects.',time:'12:10 PM',channel:'Operations'},
+    {author:'Priya Sharma',initials:'PS',text:'Vendor documents received for PO-7841; review is in progress.',time:'11:42 AM',channel:'Logistics'},
+    {author:'Safety Desk',initials:'SD',text:'PPE spot check completed at Pune site. Compliance measured at 99%.',time:'10:18 AM',channel:'Safety'},
+    {author:'HR Ops',initials:'HR',text:'POSH refresher acknowledgement received from the Mumbai team.',time:'09:35 AM',channel:'Compliance'}
+  ],shipments:[
+    {id:'SHP-24081',vendor:'Aranya Textiles',route:'Surat → Pune Factory',eta:'12 Nov · 10:30 AM',qty:'1,240 units',status:'In transit'},
+    {id:'SHP-24079',vendor:'Eastern Looms',route:'Kolkata → Mumbai HQ',eta:'12 Nov · 2:00 PM',qty:'860 units',status:'In transit'},
+    {id:'SHP-24073',vendor:'Narmada Packaging',route:'Indore → Pune Factory',eta:'11 Nov · 9:00 AM',qty:'3,200 cartons',status:'Delayed'}
+  ],safety:[
+    {id:'SAFE-0182',name:'Emergency exit signage partially obstructed',site:'Pune Factory',reported:'10 Nov, 3:20 PM',owner:'Arjun Mehta',risk:'Medium',status:'Open'},
+    {id:'SAFE-0181',name:'Replace worn anti-slip mat at packing line',site:'Pune Factory',reported:'09 Nov, 11:05 AM',owner:'Maya Nair',risk:'Low',status:'In progress'},
+    {id:'SAFE-0178',name:'Guardrail inspection completed',site:'Mumbai Warehouse',reported:'08 Nov, 9:40 AM',owner:'Sahil Rao',risk:'Low',status:'Resolved'}
+  ],compliance:[
+    {control:'POSH awareness & acknowledgement',owner:'HR Operations',due:'14 Nov 2026',coverage:'94.2%',status:'In progress'},
+    {control:'Vendor data handling review',owner:'Procurement',due:'11 Nov 2026',coverage:'87.5%',status:'Review'},
+    {control:'Workplace safety induction',owner:'Site Operations',due:'18 Nov 2026',coverage:'99.1%',status:'On track'},
+    {control:'Access review · shared workspaces',owner:'IT Administration',due:'22 Nov 2026',coverage:'100%',status:'On track'},
+    {control:'Record retention schedule review',owner:'Legal Operations',due:'28 Nov 2026',coverage:'92.0%',status:'On track'}
+  ],guilds:[
+    {name:'Operations Circle',members:12,topic:'Peer learning · Operations',color:'var(--green-soft)',icon:'◉'},
+    {name:'People & Culture',members:9,topic:'Mentorship · Workplace wellbeing',color:'var(--purple-soft)',icon:'◎'},
+    {name:'Supply Network Guild',members:14,topic:'Problem-solving · Logistics',color:'var(--blue-soft)',icon:'▣'}
+  ]};
+  const storageKey='bwe-mvp-v1';let state;try{state=JSON.parse(localStorage.getItem(storageKey))||structuredClone(seed)}catch(e){state=JSON.parse(JSON.stringify(seed))}let taskFilter='all';let searchTerm='';
+  const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+  function save(){try{localStorage.setItem(storageKey,JSON.stringify(state))}catch(e){}}
+  function toast(text){const el=$('#toast');el.textContent=text;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600)}
+  function escapeText(text){return String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function statusPill(status){const type={'Open':'red','In progress':'blue','Review':'amber','On track':'green','Resolved':'green','In transit':'blue','Delayed':'amber','Delivered':'green'}[status]||'amber';return `<span class="pill ${type}">${escapeText(status)}</span>`}
+  function filteredTasks(){return state.tasks.filter(t=>(taskFilter==='all'||t.status===taskFilter)&&(!searchTerm||`${t.name} ${t.detail} ${t.owner} ${t.status}`.toLowerCase().includes(searchTerm)))}
+  function taskRows(){return filteredTasks().map(t=>`<tr><td><div class="task-name">${escapeText(t.name)}</div><div class="task-detail">${escapeText(t.detail)}</div></td><td><div class="owner-cell"><span class="tiny-avatar">${escapeText(t.initials)}</span>${escapeText(t.owner)}</div></td><td>${escapeText(t.due)}</td><td>${t.priority==='High'?'<span class="pill red">High</span>':t.priority==='Medium'?'<span class="pill amber">Medium</span>':'<span class="pill blue">Low</span>'}</td><td><select class="select task-status" data-id="${t.id}" aria-label="Status for ${escapeText(t.name)}"><option ${t.status==='Open'?'selected':''}>Open</option><option ${t.status==='In progress'?'selected':''}>In progress</option><option ${t.status==='Review'?'selected':''}>Review</option><option ${t.status==='Completed'?'selected':''}>Completed</option></select></td><td><button class="table-action" aria-label="Task options" data-task="${t.id}">···</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty-state">No matching work items.</td></tr>'}
+  function renderTasks(){['#taskTable','#operationsTable'].forEach(sel=>{const el=$(sel);if(el)el.innerHTML=taskRows()});$('#activeTasks').textContent=state.tasks.filter(t=>t.status!=='Completed').length;const done=state.tasks.filter(t=>t.status==='Completed').length;$('#completedKpi').textContent=`${Math.round((done+state.tasks.length*0.81)/state.tasks.length*10)/10}%`;$$('.task-status').forEach(el=>el.addEventListener('change',()=>{const t=state.tasks.find(x=>x.id===Number(el.dataset.id));if(t){t.status=el.value;save();renderTasks();toast(`Task status updated to ${t.status}`)}}));$$('[data-task]').forEach(el=>el.addEventListener('click',()=>{const t=state.tasks.find(x=>x.id===Number(el.dataset.task));if(t){const next={Open:'In progress','In progress':'Review',Review:'Completed',Completed:'Open'}[t.status];t.status=next;save();renderTasks();toast(`Task moved to ${next}`)}}))}
+  function renderActivity(){const list=$('#activityList');if(list)list.innerHTML=state.updates.slice(0,4).map((u,i)=>`<div class="activity"><span class="activity-mark" style="background:${i%2?'var(--blue-soft)':'var(--green-soft)'};color:${i%2?'var(--blue)':'var(--green)'}">${escapeText(u.initials)}</span><div class="activity-text"><b>${escapeText(u.author)}</b> · ${escapeText(u.text)}<span class="activity-time">${escapeText(u.time)} · ${escapeText(u.channel)}</span></div></div>`).join('');$('#updateCount').textContent=24+Math.max(0,state.updates.length-seed.updates.length)}
+  function renderCompliance(){const el=$('#complianceTable');if(el)el.innerHTML=state.compliance.map((c,i)=>`<tr><td class="task-name">${escapeText(c.control)}</td><td>${escapeText(c.owner)}</td><td>${escapeText(c.due)}</td><td>${escapeText(c.coverage)}</td><td>${statusPill(c.status)}</td><td><button class="btn review-control" data-index="${i}">${c.status==='Review'?'Review':'Open'}</button></td></tr>`).join('');$$('.review-control').forEach(b=>b.onclick=()=>{const c=state.compliance[Number(b.dataset.index)];c.status=c.status==='Review'?'In progress':'Review';save();renderCompliance();toast('Control status updated')})}
+  function renderShipments(){const el=$('#shipmentTable');if(el)el.innerHTML=state.shipments.map((s,i)=>`<tr><td><div class="task-name">${escapeText(s.id)}</div></td><td><div class="task-name">${escapeText(s.vendor)}</div><div class="task-detail">${escapeText(s.route)}</div></td><td>${escapeText(s.eta)}</td><td>${escapeText(s.qty)}</td><td>${statusPill(s.status)}</td><td><button class="btn shipment-action" data-index="${i}">Update</button></td></tr>`).join('');$('#transitCount').textContent=String(state.shipments.filter(s=>s.status==='In transit').length).padStart(2,'0');$('#exceptionCount').textContent=String(state.shipments.filter(s=>s.status==='Delayed').length).padStart(2,'0');$$('.shipment-action').forEach(b=>b.onclick=()=>{const s=state.shipments[Number(b.dataset.index)];const next={'In transit':'Delivered',Delayed:'In transit',Delivered:'In transit'}[s.status]||'In transit';s.status=next;save();renderShipments();toast(`${s.id} marked ${next.toLowerCase()}`)})}
+  function renderSafety(){const el=$('#safetyTable');if(el)el.innerHTML=state.safety.map((s,i)=>`<tr><td><div class="task-name">${escapeText(s.name)}</div><div class="task-detail">${escapeText(s.id)}</div></td><td>${escapeText(s.site)}</td><td>${escapeText(s.reported)}</td><td>${escapeText(s.owner)}</td><td>${s.risk==='High'?'<span class="pill red">High</span>':s.risk==='Medium'?'<span class="pill amber">Medium</span>':'<span class="pill blue">Low</span>'}</td><td>${statusPill(s.status)}</td><td><button class="btn safety-action" data-index="${i}">${s.status==='Resolved'?'Reopen':'Resolve'}</button></td></tr>`).join('');const open=state.safety.filter(x=>x.status!=='Resolved').length;$('#openSafety').textContent=String(open).padStart(2,'0');$('#safetyCount').textContent=String(open).padStart(2,'0');$$('.safety-action').forEach(b=>b.onclick=()=>{const s=state.safety[Number(b.dataset.index)];s.status=s.status==='Resolved'?'Open':'Resolved';save();renderSafety();toast(`Safety action ${s.status.toLowerCase()}`)})}
+  function renderGuilds(){const el=$('#guildGrid');if(el)el.innerHTML=state.guilds.map(g=>`<article class="panel module-card"><div class="module-head"><span class="kpi-icon" style="background:${g.color};color:var(--green)">${escapeText(g.icon)}</span><div><strong>${escapeText(g.name)}</strong><small>${escapeText(g.topic)}</small></div></div><div class="module-number">${g.members}</div><div class="module-description">Members · voluntary peer group</div><div class="module-footer"><span class="pill green">Active</span><button class="btn guild-join">Open guild →</button></div></article>`).join('');$$('.guild-join').forEach(b=>b.onclick=()=>toast('Guild workspace is a prototype view'))}
+  function renderCharts(){const vals=[55,68,61,79,72,91,84],targets=[65,65,68,70,72,75,78],days=['Wed','Thu','Fri','Sat','Sun','Mon','Tue'];$('#performanceChart').innerHTML=vals.map((v,i)=>`<div class="bar-group"><div class="bars"><span class="bar" style="height:${v}%" title="${v} completed"></span><span class="bar secondary" style="height:${targets[i]}%" title="${targets[i]} target"></span></div><span class="bar-label">${days[i]}</span></div>`).join('');const el=$('#reportChart');if(el)el.innerHTML=vals.map((v,i)=>`<div class="report-column"><span class="bar" style="height:${v}%" title="${v} work items"></span><small>${days[i]}</small></div>`).join('')}
+  function renderAll(){renderTasks();renderActivity();renderCompliance();renderShipments();renderSafety();renderGuilds();renderCharts()}
+  function navigate(name){const target=document.getElementById(`view-${name}`);if(!target)return;$$('.view').forEach(v=>v.classList.remove('active'));target.classList.add('active');$$('.nav button[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));$('#crumb').textContent=({overview:'Overview',operations:'Operations',compliance:'Compliance',logistics:'Logistics',safety:'Safety',reports:'Reports',guilds:'Desi Baithak',settings:'Workspace settings'})[name]||name;$('#sidebar').classList.remove('open');window.scrollTo(0,0)}
+  function downloadCsv(filename,rows){const csv=rows.map(row=>row.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);toast(`${filename} downloaded`)}
+  function exportRows(type){if(type==='tasks')downloadCsv('bharat-workplace-tasks.csv',[['Task','Details','Owner','Due','Priority','Status'],...state.tasks.map(t=>[t.name,t.detail,t.owner,t.due,t.priority,t.status])]);else if(type==='compliance')downloadCsv('bharat-workplace-controls.csv',[['Control','Owner','Evidence due','Coverage','Status'],...state.compliance.map(c=>[c.control,c.owner,c.due,c.coverage,c.status])]);else if(type==='shipments')downloadCsv('bharat-workplace-shipments.csv',[['Shipment','Vendor','Route','ETA','Quantity','State'],...state.shipments.map(s=>[s.id,s.vendor,s.route,s.eta,s.qty,s.status])]);else if(type==='safety')downloadCsv('bharat-workplace-safety.csv',[['ID','Action','Site','Reported','Owner','Risk','Status'],...state.safety.map(s=>[s.id,s.name,s.site,s.reported,s.owner,s.risk,s.status])]);else if(type==='all')downloadCsv('bharat-workplace-summary.csv',[['Dataset','Name','Owner','Status'],...state.tasks.map(t=>['Task',t.name,t.owner,t.status]),...state.shipments.map(s=>['Shipment',s.id,s.vendor,s.status]),...state.safety.map(s=>['Safety',s.name,s.owner,s.status])])}
+  $$('.nav button[data-view]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.view)));$$('[data-goto]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.goto)));$('#menuToggle').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));$('#notifyBtn').addEventListener('click',()=>toast('You’re all caught up.'));
+  $$('.filter-btn').forEach(b=>b.addEventListener('click',()=>{const group=b.parentElement;group.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');taskFilter=b.dataset.filter;renderTasks()}));$('#globalSearch').addEventListener('input',e=>{searchTerm=e.target.value.trim().toLowerCase();renderTasks();if(searchTerm)navigate('operations')});
+  $('#updateForm').addEventListener('submit',e=>{e.preventDefault();const input=$('#updateInput'),text=input.value.trim();if(!text)return;let category='Operations',metric='Operational update',place='Local workspace',status='Captured';const lower=text.toLowerCase();if(/posh|policy|training|compliance|acknowledg/.test(lower)){category='Compliance';metric='Compliance / training';}else if(/shipment|vendor|batch|delivery|logistic|dispatch/.test(lower)){category='Logistics';metric='Supply / quality';}else if(/safety|ppe|incident|hazard|inspection/.test(lower)){category='Safety';metric='Safety / inspection';}const batch=text.match(/batch\s*#?\d+/i);if(batch)place=batch[0].replace('#',' #');else if(/pune/i.test(text))place='Pune site';else if(/mumbai/i.test(text))place='Mumbai site';if(/incident|breach|injury|hazard/i.test(lower))status='Needs review';else if(/0 defects|zero defects|100%/.test(lower))status='Positive result';const parsed=$('#latestParsed');parsed.style.display='block';parsed.innerHTML=`<strong>Suggested record · please verify</strong><br>Category: ${escapeText(metric)} &nbsp;·&nbsp; Location: ${escapeText(place)} &nbsp;·&nbsp; State: ${escapeText(status)}<br><span style="color:#798697">Text is stored only in this browser demo; this is not connected to Ollama or a messaging service.</span>`;state.updates.unshift({author:'Abhishek Rajan',initials:'AR',text,time:new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'}),channel:category});save();renderActivity();input.value='';toast('Operational update captured locally')});
+  $('#quickAdd').onclick=()=>navigate('operations');$('#newTask').onclick=()=>{const name=prompt('What work needs to be done?');if(!name||!name.trim())return;state.tasks.unshift({id:Date.now(),name:name.trim(),detail:'Operations · added just now',owner:'Abhishek Rajan',initials:'AR',due:'Tomorrow',priority:'Medium',status:'Open'});save();renderTasks();toast('Work item added')};$('#addControl').onclick=()=>{const name=prompt('Control or evidence item name:');if(!name||!name.trim())return;state.compliance.unshift({control:name.trim(),owner:'Workspace admin',due:'To be scheduled',coverage:'Pending',status:'Review'});save();renderCompliance();toast('Control added to demo register')};$('#addShipment').onclick=()=>{const vendor=prompt('Vendor name:');if(!vendor||!vendor.trim())return;state.shipments.unshift({id:`SHP-${Date.now().toString().slice(-5)}`,vendor:vendor.trim(),route:'Route to be confirmed',eta:'To be scheduled',qty:'Not specified',status:'In transit'});save();renderShipments();toast('Shipment added')};$('#reportIncident').onclick=()=>{const name=prompt('Brief non-sensitive hazard or corrective action (do not enter private employee details):');if(!name||!name.trim())return;state.safety.unshift({id:`SAFE-${Date.now().toString().slice(-4)}`,name:name.trim(),site:'Site to be assigned',reported:new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short'})+', '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),owner:'Unassigned',risk:'Medium',status:'Open'});save();renderSafety();toast('Safety action recorded locally')};$('#newGuild').onclick=()=>{const name=prompt('Name your peer guild:');if(!name||!name.trim())return;state.guilds.push({name:name.trim(),members:1,topic:'Peer learning · New guild',color:'var(--green-soft)',icon:'◎'});save();renderGuilds();toast('Peer guild created')};$('#clearDemo').onclick=()=>{if(confirm('Reset all local demo data to the original sample?')){state=JSON.parse(JSON.stringify(seed));save();renderAll();toast('Demo data reset')}};
+  $('#exportOverview').onclick=()=>exportRows('all');$('#reportDownload').onclick=()=>exportRows('all');$('#complianceExport').onclick=()=>exportRows('compliance');$('#logisticsExport').onclick=()=>exportRows('shipments');$('#safetyExport').onclick=()=>exportRows('safety');$$('[data-export]').forEach(b=>b.onclick=()=>exportRows(b.dataset.export));$('#reportPeriod').onchange=()=>toast(`Report period: ${$('#reportPeriod').value} (sample data)`);$('#reportCategory').onchange=()=>toast(`Showing ${$('#reportCategory').value.toLowerCase()} sample`);$$('.guild-join').forEach(b=>b.onclick=()=>toast('Guild workspace is a prototype view'));
+  renderAll();
+})();
+</script>
 </body>
 </html>
